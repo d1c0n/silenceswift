@@ -1,4 +1,3 @@
-# common/storage.py
 import os
 import boto3
 from botocore.client import Config
