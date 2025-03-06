@@ -13,7 +13,9 @@ dependencies = [
     "flask (>=3.1.0,<4.0.0)",
     "redis (>=5.2.1,<6.0.0)",
     "boto3 (>=1.37.8,<2.0.0)",
-    "silencewarp (>=0.2.0,<0.3.0)"
+    "silencewarp (>=0.2.0,<0.3.0)",
+    "python-dotenv (>=1.0.1,<2.0.0)",
+    "psycopg[binary] (>=3.2.5,<4.0.0)",
 ]
 
 

@@ -7,12 +7,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from common.models import Base, Job, JobStatus
 from common.storage import upload_file
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 
 app = Flask(__name__)
 
 # Initialize database connection
 DB_URL = os.environ.get(
-    "DATABASE_URL", "postgresql://user:password@localhost/video_processor"
+    "DATABASE_URL", "postgresql+psycopg://user:password@localhost/video_processor"
 )
 engine = create_engine(DB_URL)
 Base.metadata.create_all(engine)
