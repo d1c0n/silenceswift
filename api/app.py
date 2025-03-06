@@ -1,4 +1,3 @@
-# api/app.py
 import os
 import uuid
 from flask import Flask, request, jsonify
