@@ -1,6 +1,6 @@
 # SilenceSwift Video Processing System
 
-SilenceSwift is a distributed video processing system designed to automatically detect and speed up silent portions of videos. The system uses a microservices architecture to efficiently process videos through splitting, silence detection, speed adjustment, and merging.
+SilenceSwift is a distributed video processing system designed to automatically detect and speed up silent portions of videos based on [silencewarp](https://github.com/d1c0n/silencewarp). The system uses a microservices architecture to efficiently process videos through splitting, silence detection, speed adjustment, and merging.
 
 ## System Architecture Overview
 
