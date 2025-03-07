@@ -15,6 +15,10 @@ from silencewarp import (
     create_ffmpeg_speedup_filter,
     _run_ffmpeg_command,
 )
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize database and Redis connections (similar to splitter.py)
 DB_URL = os.environ.get(
@@ -162,6 +166,33 @@ def process_chunk(job_data):
         print(f"Error processing chunk {chunk_id}: {e}")
 
 
+def check_for_unproccsed_chunks():
+    session = Session()
+    unprocessed_chunks = (
+        session.query(Chunk).filter(Chunk.status == ChunkStatus.PENDING).all()
+    )
+
+    for chunk in unprocessed_chunks:
+        # Check if the chunk is still pending
+        if chunk.status == ChunkStatus.PENDING:
+            # Requeue the chunk for processing if the queue is empty
+            print(f"Requeuing chunk {chunk.id} for processing")
+            redis_client.lpush(
+                "process_queue",
+                json.dumps(
+                    {
+                        "job_id": chunk.job_id,
+                        "chunk_id": chunk.id,
+                        "input_path": chunk.input_path,
+                    }
+                ),
+            )
+            print(f"Requeued chunk {chunk.id} for processing")
+
+    # Close the session
+    session.close()
+
+
 def run_worker():
     print("Starting processor worker...")
     while True:
@@ -173,6 +204,10 @@ def run_worker():
             job = json.loads(job_json)
             print(f"Processing chunk: {job['chunk_id']} for job: {job['job_id']}")
             process_chunk(job)
+
+        else:
+            if redis_client.llen("process_queue") == 0:
+                check_for_unproccsed_chunks()
 
         # Small sleep to avoid busy-waiting
         time.sleep(0.1)
