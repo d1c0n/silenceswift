@@ -2,6 +2,7 @@ services:
   postgres:
     env_file: ".env"
     image: postgres:latest
+    network_mode: host
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -13,6 +14,7 @@ services:
   
   redis:
     image: redis:latest
+    network_mode: host
     ports:
       - "6379:6379"
     volumes:
@@ -21,6 +23,7 @@ services:
   minio:
     image: minio/minio:latest
     env_file: ".env"
+    network_mode: host
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
@@ -31,6 +34,13 @@ services:
     volumes:
       - miniodata:/data
 
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    network_mode: host
+    
+
 volumes:
   pgdata:
     driver: local
@@ -38,3 +48,5 @@ volumes:
     driver: local
   miniodata:
     driver: local
+
+
