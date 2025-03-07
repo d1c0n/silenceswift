@@ -10,6 +10,9 @@ from sqlalchemy.orm import sessionmaker
 from common.models import Base, Job, JobStatus, Chunk, ChunkStatus
 from common.storage import download_file, upload_from_path
 from silencewarp import split_video
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Initialize database connection
 DB_URL = os.environ.get(
@@ -89,7 +92,10 @@ def process_split_job(job_data):
         job.status = JobStatus.FAILED
         job.error = str(e)
         session.commit()
-        print(f"Error processing job {job_id}: {e}")
+        print(f"Error processing job {job_id}: {e}, requeuing job")
+        redis_client.lpush(
+            "split_queue", json.dumps({"job_id": job_id, "input_path": input_path})
+        )
 
 
 def run_worker():
