@@ -1,6 +1,11 @@
 import os
 import boto3
 from botocore.client import Config
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 
 # MinIO configuration
 MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT", "localhost:9000")
