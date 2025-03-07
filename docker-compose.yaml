@@ -2,7 +2,6 @@ services:
   postgres:
     env_file: ".env"
     image: postgres:latest
-    network_mode: host
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -14,7 +13,6 @@ services:
   
   redis:
     image: redis:latest
-    network_mode: host
     ports:
       - "6379:6379"
     volumes:
@@ -23,7 +21,6 @@ services:
   minio:
     image: minio/minio:latest
     env_file: ".env"
-    network_mode: host
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
@@ -38,9 +35,82 @@ services:
     image: adminer:latest
     ports:
       - "8080:8080"
-    network_mode: host
     
+  api:
+      build:
+        context: .
+        dockerfile: Dockerfile.api
+      environment:
+        DATABASE_URL: postgresql+psycopg://video:video@postgres:5432/video_processor
+        REDIS_URL: redis://redis:6379/0
+        MINIO_ENDPOINT: minio:9000
+        MINIO_ACCESS_KEY: minioadmin
+        MINIO_SECRET_KEY: minioadmin
+        MINIO_BUCKET: video-processor
+      depends_on:
+        - postgres
+        - redis
+        - minio
+      ports:
+        - "5000:5000"
 
+    # splitter:
+    #   build:
+    #     context: .
+    #     dockerfile: Dockerfile.worker
+    #   command: python -m workers.splitter
+    #   environment:
+    #     DATABASE_URL: postgresql://video:password@postgres/video_processor
+    #     REDIS_URL: redis://redis:6379/0
+    #     MINIO_ENDPOINT: minio:9000
+    #     MINIO_ACCESS_KEY: minioadmin
+    #     MINIO_SECRET_KEY: minioadmin
+    #     MINIO_BUCKET: video-processor
+    #   depends_on:
+    #     - postgres
+    #     - redis
+    #     - minio
+    #   deploy:
+    #     replicas: 2
+
+    # processor:
+    #   build:
+    #     context: .
+    #     dockerfile: Dockerfile.worker
+    #   command: python -m workers.processor
+    #   environment:
+    #     DATABASE_URL: postgresql://video:password@postgres/video_processor
+    #     REDIS_URL: redis://redis:6379/0
+    #     MINIO_ENDPOINT: minio:9000
+    #     MINIO_ACCESS_KEY: minioadmin
+    #     MINIO_SECRET_KEY: minioadmin
+    #     MINIO_BUCKET: video-processor
+    #     SILENCE_PERCENTILE: "30.0"
+    #     SILENCE_DURATION: "0.35"
+    #     SPEED_FACTOR: "10.0"
+    #   depends_on:
+    #     - postgres
+    #     - redis
+    #     - minio
+    #   deploy:
+    #     replicas: 4
+
+    # merger:
+    #   build:
+    #     context: .
+    #     dockerfile: Dockerfile.worker
+    #   command: python -m workers.merger
+    #   environment:
+    #     DATABASE_URL: postgresql://video:password@postgres/video_processor
+    #     REDIS_URL: redis://redis:6379/0
+    #     MINIO_ENDPOINT: minio:9000
+    #     MINIO_ACCESS_KEY: minioadmin
+    #     MINIO_SECRET_KEY: minioadmin
+    #     MINIO_BUCKET: video-processor
+    #   depends_on:
+    #     - postgres
+    #     - redis
+    #     - minio
 volumes:
   pgdata:
     driver: local

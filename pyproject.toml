@@ -16,6 +16,7 @@ dependencies = [
     "silencewarp (>=0.2.0,<0.3.0)",
     "python-dotenv (>=1.0.1,<2.0.0)",
     "psycopg[binary] (>=3.2.5,<4.0.0)",
+    "eventlet (>=0.39.1,<0.40.0)",
 ]
 
 

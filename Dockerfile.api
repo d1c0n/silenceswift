@@ -1,0 +1,20 @@
+FROM python:3.13
+LABEL maintainer="@d1c0n"
+
+# Set the working directory
+WORKDIR /app
+# Install Poetry
+RUN pip install poetry
+# Copy the requirements file into the container
+COPY poetry.lock pyproject.toml /app/
+# Install dependencies
+RUN poetry install
+# Copy the rest of the application code into the container
+COPY ./api/ /app/api
+COPY ./common/ /app/common
+
+
+# Expose the port the app runs on
+EXPOSE 5000
+# Command to run the application
+CMD ["poetry","run","python", "-m", "api.app"]
