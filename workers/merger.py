@@ -9,6 +9,11 @@ from sqlalchemy.orm import sessionmaker
 from common.models import Base, Job, JobStatus, Chunk, ChunkStatus
 from common.storage import download_file, upload_from_path
 from silencewarp import merge_chunks
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 
 # Initialize database and Redis connections
 DB_URL = os.environ.get(
